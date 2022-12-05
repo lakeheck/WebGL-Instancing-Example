@@ -154,8 +154,8 @@ u_worldInverseTranspose: m4.identity(),
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
 // Create a texture to render to
-  const targetTextureWidth = 256;
-  const targetTextureHeight = 256;
+  const targetTextureWidth = 1024;
+  const targetTextureHeight = 1024;
   const targetTexture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, targetTexture);
 
@@ -1765,10 +1765,10 @@ function updateKeywords () {
 function drawScene(time) {
     time = time * 0.0001 + 5;
 
-    resizeCanvasToDisplaySize(gl.canvas);
+    // resizeCanvasToDisplaySize(gl.canvas);
 
     // Tell WebGL how to convert from clip space to pixels
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.viewport(0, 0, window.innerWidth, window.innerHeight);
 
     // Clear the canvas AND the depth buffer.
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -1834,26 +1834,6 @@ function drawScene(time) {
         blit(input);
     });
     
-    //// THINK I JUST NEED TO REPLACE THE BELOW WITH THE FLUID SIM CODE ..... ???
-    // input = createFBOwithTexture(targetTextureWidth, targetTextureHeight, gl.RGBA16F, gl.RGBA, gl.HALF_FLOAT , gl.LINEAR, targetTexture);
-    input.texture = targetTexture;
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    
-    // render the cube with the texture we just rendered to
-    gl.bindTexture(gl.TEXTURE_2D, input.texture);
-    
-    // Tell WebGL how to convert from clip space to pixels
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    // blit(input);
-
-    // // Clear the canvas AND the depth buffer.
-    gl.clearColor(1, 1, 1, 1);   // clear to white
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-
-    drawCube(aspect);
-    // blit(input);
-
     requestAnimationFrame(drawScene);
 }
 
