@@ -1,59 +1,15 @@
 "use strict";
+import Parameters from "./js/config.js"
+import startGUI from "./js/GUI.js";
+import {gl, ext, canvas} from "./js/WebGL.js";
+import * as LGL from "./js/WebGL.js";
 
-// Get A WebGL context
-/** @type {HTMLCanvasElement} */
-const canvas = document.getElementsByTagName('canvas')[0];
-const { gl, ext } = getWebGLContext(canvas);
 
 resizeCanvas();
 
 
+let config = Parameters();
 
-//inital config for sim params 
-let config = {
-    SIM_RESOLUTION: 256, //simres
-    DYE_RESOLUTION: 1024, //output res 
-    ASPECT: 1.0,
-    FLOW: 0.0066,
-    SPLAT_FLOW: 0.5,
-    VELOCITYSCALE: 1.0,
-    CAPTURE_RESOLUTION: 1024, //screen capture res 
-    DENSITY_DISSIPATION: .85, //def need to figure out this one, think perhaps bc im squaring the color in splatColor
-    VELOCITY_DISSIPATION: 2.15,
-    PRESSURE: 0.8,
-    PRESSURE_ITERATIONS: 30,
-    CURL: 30,
-    SPLAT_RADIUS: 0.25,
-    SPLAT_FORCE: 6000,
-    SHADING: true,
-    COLORFUL: false,
-    COLOR_UPDATE_SPEED: 10,
-    PAUSED: false,
-    BACK_COLOR: { r: 0, g: 0, b: 0 },
-    TRANSPARENT: false,
-    BLOOM: false,
-    BLOOM_ITERATIONS: 8,
-    BLOOM_RESOLUTION: 256,
-    BLOOM_INTENSITY: 0.8,
-    BLOOM_THRESHOLD: 0.6,
-    BLOOM_SOFT_KNEE: 0.7,
-    SUNRAYS: true,
-    SUNRAYS_RESOLUTION: 196,
-    SUNRAYS_WEIGHT: 0.4,
-    FORCE_MAP_ENABLE: true,
-    DENSITY_MAP_ENABLE: true, 
-    COLOR_MAP_ENABLE:true,
-    EXPONENT: 1.0,
-    PERIOD: 3.0,
-    RIDGE: 1.0,
-    AMP: 1.0,
-    LACUNARITY: 2.0,
-    GAIN: 0.5,
-    OCTAVES: 4,
-    MONO: false,
-    NOISE_TRANSLATE_SPEED: 0.15,
-    DISPLAY_FLUID: true
-}
 
 //create a prototype data structure for our pointers (ie a click or touch)
 //we want to be a able to have more than one in the case of a multi - touch input 
@@ -227,156 +183,156 @@ var modelXRotationRadians = degToRad(0);
 var modelYRotationRadians = degToRad(0);
 
 
-function resizeCanvasToDisplaySize(canvas) {
-    // Lookup the size the browser is displaying the canvas in CSS pixels.
-    const displayWidth  = window.innerWidth;
-    const displayHeight = window.innerHeight;
+// function resizeCanvasToDisplaySize(canvas) {
+//     // Lookup the size the browser is displaying the canvas in CSS pixels.
+//     const displayWidth  = window.innerWidth;
+//     const displayHeight = window.innerHeight;
 
-    // Check if the canvas is not the same size.
-    const needResize = canvas.width  !== displayWidth ||
-                        canvas.height !== displayHeight;
+//     // Check if the canvas is not the same size.
+//     const needResize = canvas.width  !== displayWidth ||
+//                         canvas.height !== displayHeight;
 
-    if (needResize) {
-        // Make the canvas the same size
-        canvas.width  = displayWidth;
-        canvas.height = displayHeight;
-    }
+//     if (needResize) {
+//         // Make the canvas the same size
+//         canvas.width  = displayWidth;
+//         canvas.height = displayHeight;
+//     }
 
-    return needResize;
-}
-function drawCube(aspect) {
-    // Tell it to use our boxProgram (pair of shaders)
-    gl.useProgram(boxProgram.program);
+//     return needResize;
+// }
+// function drawCube(aspect) {
+//     // Tell it to use our boxProgram (pair of shaders)
+//     gl.useProgram(boxProgram.program);
 
-    // Turn on the position attribute
-    gl.enableVertexAttribArray(positionLocation);
+//     // Turn on the position attribute
+//     gl.enableVertexAttribArray(positionLocation);
 
-    // Bind the position buffer.
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+//     // Bind the position buffer.
+//     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-    // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-    var size = 3;          // 3 components per iteration
-    var type = gl.FLOAT;   // the data is 32bit floats
-    var normalize = false; // don't normalize the data
-    var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-    var offset = 0;        // start at the beginning of the buffer
-    gl.vertexAttribPointer(
-        positionLocation, size, type, normalize, stride, offset);
+//     // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+//     var size = 3;          // 3 components per iteration
+//     var type = gl.FLOAT;   // the data is 32bit floats
+//     var normalize = false; // don't normalize the data
+//     var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+//     var offset = 0;        // start at the beginning of the buffer
+//     gl.vertexAttribPointer(
+//         positionLocation, size, type, normalize, stride, offset);
 
-    // Turn on the texcoord attribute
-    gl.enableVertexAttribArray(texcoordLocation);
+//     // Turn on the texcoord attribute
+//     gl.enableVertexAttribArray(texcoordLocation);
 
-    // bind the texcoord buffer.
-    gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
+//     // bind the texcoord buffer.
+//     gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
 
-    // Tell the texcoord attribute how to get data out of texcoordBuffer (ARRAY_BUFFER)
-    var size = 2;          // 2 components per iteration
-    var type = gl.FLOAT;   // the data is 32bit floats
-    var normalize = false; // don't normalize the data
-    var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-    var offset = 0;        // start at the beginning of the buffer
-    gl.vertexAttribPointer(
-        texcoordLocation, size, type, normalize, stride, offset);
+//     // Tell the texcoord attribute how to get data out of texcoordBuffer (ARRAY_BUFFER)
+//     var size = 2;          // 2 components per iteration
+//     var type = gl.FLOAT;   // the data is 32bit floats
+//     var normalize = false; // don't normalize the data
+//     var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+//     var offset = 0;        // start at the beginning of the buffer
+//     gl.vertexAttribPointer(
+//         texcoordLocation, size, type, normalize, stride, offset);
 
-    // Compute the projection matrix
-    var projectionMatrix =
-        m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
+//     // Compute the projection matrix
+//     var projectionMatrix =
+//         m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
 
-    var cameraPosition = [0, 0, 2];
-    var up = [0, 1, 0];
-    var target = [0, 0, 0];
+//     var cameraPosition = [0, 0, 2];
+//     var up = [0, 1, 0];
+//     var target = [0, 0, 0];
 
-    // Compute the camera's matrix using look at.
-    var cameraMatrix = m4.lookAt(cameraPosition, target, up);
+//     // Compute the camera's matrix using look at.
+//     var cameraMatrix = m4.lookAt(cameraPosition, target, up);
 
-    // Make a view matrix from the camera matrix.
-    var viewMatrix = m4.inverse(cameraMatrix);
+//     // Make a view matrix from the camera matrix.
+//     var viewMatrix = m4.inverse(cameraMatrix);
 
-    var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
+//     var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
 
-    var matrix = m4.xRotate(viewProjectionMatrix, modelXRotationRadians);
-    matrix = m4.yRotate(matrix, modelYRotationRadians);
+//     var matrix = m4.xRotate(viewProjectionMatrix, modelXRotationRadians);
+//     matrix = m4.yRotate(matrix, modelYRotationRadians);
 
-    // Set the matrix.
-    gl.uniformMatrix4fv(matrixLocation, false, matrix);
+//     // Set the matrix.
+//     gl.uniformMatrix4fv(matrixLocation, false, matrix);
 
-    // Tell the shader to use texture unit 0 for u_texture
-    gl.uniform1i(textureLocation, 0);
+//     // Tell the shader to use texture unit 0 for u_texture
+//     gl.uniform1i(textureLocation, 0);
 
-    // Draw the geometry.
-    gl.drawArrays(gl.TRIANGLES, 0, 6 * 6);
-  }
+//     // Draw the geometry.
+//     gl.drawArrays(gl.TRIANGLES, 0, 6 * 6);
+//   }
 
 
-  function startGUI () {
-    const parName = 'Output Resolution';
-    //dat is a library developed by Googles Data Team for building JS interfaces. Needs to be included in project directory 
-    var gui = new dat.GUI({ width: 300 });
+//   function startGUI () {
+//     const parName = 'Output Resolution';
+//     //dat is a library developed by Googles Data Team for building JS interfaces. Needs to be included in project directory 
+//     var gui = new dat.GUI({ width: 300 });
 
-    gui.add(config, 'DISPLAY_FLUID').name('Render Fluid <> Vel Map');
+//     gui.add(config, 'DISPLAY_FLUID').name('Render Fluid <> Vel Map');
 
-    let fluidFolder = gui.addFolder('Fluid Settings');
-    fluidFolder.add(config, 'DYE_RESOLUTION', { 'high': 1024, 'medium': 512, 'low': 256, 'very low': 128 }).name(parName).onFinishChange(initFramebuffers);
-    fluidFolder.add(config, 'SIM_RESOLUTION', { '32': 32, '64': 64, '128': 128, '256': 256 }).name('Sim Resolution').onFinishChange(initFramebuffers);
-    fluidFolder.add(config, 'DENSITY_DISSIPATION', 0, 4.0).name('Density Diffusion');
-    fluidFolder.add(config, 'FLOW', 0, 0.5).name('Flow');
-    fluidFolder.add(config, 'SPLAT_FLOW', 0, 1).name('Splat Flow');
-    fluidFolder.add(config, 'VELOCITY_DISSIPATION', 0, 4.0).name('Velocity Diffusion');
-    fluidFolder.add(config, 'VELOCITYSCALE', 0, 10.0).name('Velocity Scale');
-    fluidFolder.add(config, 'PRESSURE', 0.0, 1.0).name('Pressure');
-    fluidFolder.add(config, 'CURL', 0, 50).name('Vorticity').step(1);
-    fluidFolder.add(config, 'SPLAT_RADIUS', 0.01, 1.0).name('Splat Radius');
-    fluidFolder.add(config, 'SHADING').name('Shading').onFinishChange(updateKeywords);
-    fluidFolder.add(config, 'PAUSED').name('Paused').listen();
-    fluidFolder.add({ fun: () => {
-        splatStack.push(parseInt(Math.random() * 20) + 5);
-    } }, 'fun').name('Random splats');
+//     let fluidFolder = gui.addFolder('Fluid Settings');
+//     fluidFolder.add(config, 'DYE_RESOLUTION', { 'high': 1024, 'medium': 512, 'low': 256, 'very low': 128 }).name(parName).onFinishChange(initFramebuffers);
+//     fluidFolder.add(config, 'SIM_RESOLUTION', { '32': 32, '64': 64, '128': 128, '256': 256 }).name('Sim Resolution').onFinishChange(initFramebuffers);
+//     fluidFolder.add(config, 'DENSITY_DISSIPATION', 0, 4.0).name('Density Diffusion');
+//     fluidFolder.add(config, 'FLOW', 0, 0.5).name('Flow');
+//     fluidFolder.add(config, 'SPLAT_FLOW', 0, 1).name('Splat Flow');
+//     fluidFolder.add(config, 'VELOCITY_DISSIPATION', 0, 4.0).name('Velocity Diffusion');
+//     fluidFolder.add(config, 'VELOCITYSCALE', 0, 10.0).name('Velocity Scale');
+//     fluidFolder.add(config, 'PRESSURE', 0.0, 1.0).name('Pressure');
+//     fluidFolder.add(config, 'CURL', 0, 50).name('Vorticity').step(1);
+//     fluidFolder.add(config, 'SPLAT_RADIUS', 0.01, 1.0).name('Splat Radius');
+//     fluidFolder.add(config, 'SHADING').name('Shading').onFinishChange(LGL.updateKeywords);
+//     fluidFolder.add(config, 'PAUSED').name('Paused').listen();
+//     fluidFolder.add({ fun: () => {
+//         splatStack.push(parseInt(Math.random() * 20) + 5);
+//     } }, 'fun').name('Random splats');
     
     
-    let mapFolder = gui.addFolder('Maps');
-    mapFolder.add(config, 'FORCE_MAP_ENABLE').name('force map enable');
-    mapFolder.add(config, 'DENSITY_MAP_ENABLE').name('density map enable'); //adding listen() will update the ui if the parameter value changes elsewhere in the program 
-    // mapFolder.add(config, 'COLOR_MAP_ENABLE').name('color map enable');
+//     let mapFolder = gui.addFolder('Maps');
+//     mapFolder.add(config, 'FORCE_MAP_ENABLE').name('force map enable');
+//     mapFolder.add(config, 'DENSITY_MAP_ENABLE').name('density map enable'); //adding listen() will update the ui if the parameter value changes elsewhere in the program 
+//     // mapFolder.add(config, 'COLOR_MAP_ENABLE').name('color map enable');
 
-    let noiseFolder = gui.addFolder('Velocity Map');
-    noiseFolder.add(config, 'PERIOD', 0, 10.0).name('Period');
-    noiseFolder.add(config, 'EXPONENT', 0, 4.0).name('Exponent');
-    noiseFolder.add(config, 'RIDGE', 0, 1.5).name('Ridge');
-    noiseFolder.add(config, 'AMP', 0, 4.0).name('Amplitude');
-    noiseFolder.add(config, 'LACUNARITY', 0, 4).name('Lacunarity');
-    noiseFolder.add(config, 'NOISE_TRANSLATE_SPEED', 0, 2).name('Noise Translate Speed');
-    noiseFolder.add(config, 'GAIN', 0.0, 1.0).name('Gain');
-    noiseFolder.add(config, 'OCTAVES', 0, 8).name('Octaves').step(1);
-    noiseFolder.add(config, 'MONO').name('Mono');
+//     let noiseFolder = gui.addFolder('Velocity Map');
+//     noiseFolder.add(config, 'PERIOD', 0, 10.0).name('Period');
+//     noiseFolder.add(config, 'EXPONENT', 0, 4.0).name('Exponent');
+//     noiseFolder.add(config, 'RIDGE', 0, 1.5).name('Ridge');
+//     noiseFolder.add(config, 'AMP', 0, 4.0).name('Amplitude');
+//     noiseFolder.add(config, 'LACUNARITY', 0, 4).name('Lacunarity');
+//     noiseFolder.add(config, 'NOISE_TRANSLATE_SPEED', 0, 2).name('Noise Translate Speed');
+//     noiseFolder.add(config, 'GAIN', 0.0, 1.0).name('Gain');
+//     noiseFolder.add(config, 'OCTAVES', 0, 8).name('Octaves').step(1);
+//     noiseFolder.add(config, 'MONO').name('Mono');
 
-    // let bloomFolder = gui.addFolder('Bloom');
-    // bloomFolder.add(config, 'BLOOM').name('enabled').onFinishChange(updateKeywords);
-    // bloomFolder.add(config, 'BLOOM_INTENSITY', 0.1, 2.0).name('intensity');
-    // bloomFolder.add(config, 'BLOOM_THRESHOLD', 0.0, 1.0).name('threshold');
+//     // let bloomFolder = gui.addFolder('Bloom');
+//     // bloomFolder.add(config, 'BLOOM').name('enabled').onFinishChange(LGL.updateKeywords);
+//     // bloomFolder.add(config, 'BLOOM_INTENSITY', 0.1, 2.0).name('intensity');
+//     // bloomFolder.add(config, 'BLOOM_THRESHOLD', 0.0, 1.0).name('threshold');
 
-    let sunraysFolder = gui.addFolder('Sunrays');
-    sunraysFolder.add(config, 'SUNRAYS').name('enabled').onFinishChange(updateKeywords);
-    sunraysFolder.add(config, 'SUNRAYS_WEIGHT', 0.01, 1.0).name('weight');
+//     let sunraysFolder = gui.addFolder('Sunrays');
+//     sunraysFolder.add(config, 'SUNRAYS').name('enabled').onFinishChange(LGL.updateKeywords);
+//     sunraysFolder.add(config, 'SUNRAYS_WEIGHT', 0.01, 1.0).name('weight');
 
-    let captureFolder = gui.addFolder('Capture');
-    captureFolder.addColor(config, 'BACK_COLOR').name('background color');
-    captureFolder.add(config, 'TRANSPARENT').name('transparent');
-    captureFolder.add({ fun: captureScreenshot }, 'fun').name('take screenshot');
+//     let captureFolder = gui.addFolder('Capture');
+//     captureFolder.addColor(config, 'BACK_COLOR').name('background color');
+//     captureFolder.add(config, 'TRANSPARENT').name('transparent');
+//     captureFolder.add({ fun: captureScreenshot }, 'fun').name('take screenshot');
 
-    //create a function to assign to a button, here linking my github
-    let github = gui.add({ fun : () => {
-        window.open('https://github.com/lakeheck/Fluid-Simulation-WebGL');
-        ga('send', 'event', 'link button', 'github');
-    } }, 'fun').name('Github');
-    github.__li.className = 'cr function bigFont';
-    github.__li.style.borderLeft = '3px solid #8C8C8C';
-    let githubIcon = document.createElement('span');
-    github.domElement.parentElement.appendChild(githubIcon);
-    githubIcon.className = 'icon github';
+//     //create a function to assign to a button, here linking my github
+//     let github = gui.add({ fun : () => {
+//         window.open('https://github.com/lakeheck/Fluid-Simulation-WebGL');
+//         ga('send', 'event', 'link button', 'github');
+//     } }, 'fun').name('Github');
+//     github.__li.className = 'cr function bigFont';
+//     github.__li.style.borderLeft = '3px solid #8C8C8C';
+//     let githubIcon = document.createElement('span');
+//     github.domElement.parentElement.appendChild(githubIcon);
+//     githubIcon.className = 'icon github';
 
-    if (isMobile())
-        gui.close();
-}
+//     if (isMobile())
+//         gui.close();
+// }
 
 //TODO - dont understand the alchemy here 
 function isMobile () {
@@ -384,69 +340,53 @@ function isMobile () {
 }
 
 
-function captureScreenshot () {
-    let res = getResolution(config.CAPTURE_RESOLUTION);
-    //use helper fxn to create frame buffer to render for screenshot 
-    let target = createFBO(res.width, res.height, ext.formatRGBA.internalFormat, ext.formatRGBA.format, ext.halfFloatTexType, gl.NEAREST);
-    render(target);
+// function captureScreenshot () {
+//     let res = getResolution(config.CAPTURE_RESOLUTION);
+//     //use helper fxn to create frame buffer to render for screenshot 
+//     let target = createFBO(res.width, res.height, ext.formatRGBA.internalFormat, ext.formatRGBA.format, ext.halfFloatTexType, gl.NEAREST);
+//     render(target);
 
-    //create a texture from the frame buffer 
-    let texture = framebufferToTexture(target);
-    texture = normalizeTexture(texture, target.width, target.height);
+//     //create a texture from the frame buffer 
+//     let texture = framebufferToTexture(target);
+//     texture = normalizeTexture(texture, target.width, target.height);
 
-    let captureCanvas = textureToCanvas(texture, target.width, target.height);
-    let datauri = captureCanvas.toDataURL();
-    //use helper fxn to download data 
-    downloadURI('fluid.png', datauri);
-    //tell browser we can forget about this url
-    URL.revokeObjectURL(datauri);
-}
+//     let captureCanvas = textureToCanvas(texture, target.width, target.height);
+//     let datauri = captureCanvas.toDataURL();
+//     //use helper fxn to download data 
+//     downloadURI('fluid.png', datauri);
+//     //tell browser we can forget about this url
+//     URL.revokeObjectURL(datauri);
+// }
 
-function framebufferToTexture (target) {
-    gl.bindFramebuffer(gl.FRAMEBUFFER, target.fbo);
-    let length = target.width * target.height * 4; //take length time width, and multiply by 4 since we have 4 channels (rgba)
-    let texture = new Float32Array(length);
-    //webgl fxn that will read pixels into a textue (texture type needs to match passed pixel data type, eg gl.FLOAT and Float32Array)
-    gl.readPixels(0, 0, target.width, target.height, gl.RGBA, gl.FLOAT, texture);
-    return texture;
-}
+// function framebufferToTexture (target) {
+//     gl.bindFramebuffer(gl.FRAMEBUFFER, target.fbo);
+//     let length = target.width * target.height * 4; //take length time width, and multiply by 4 since we have 4 channels (rgba)
+//     let texture = new Float32Array(length);
+//     //webgl fxn that will read pixels into a textue (texture type needs to match passed pixel data type, eg gl.FLOAT and Float32Array)
+//     gl.readPixels(0, 0, target.width, target.height, gl.RGBA, gl.FLOAT, texture);
+//     return texture;
+// }
 
 
 //helper to rerange to integer values on [0,255] and return array of unsigned ints 
-function normalizeTexture (texture, width, height) {
-    let result = new Uint8Array(texture.length);
-    let id = 0;
-    for (let i = height - 1; i >= 0; i--) {
-        for (let j = 0; j < width; j++) {
-            let nid = i * width * 4 + j * 4;
-            result[nid + 0] = clamp01(texture[id + 0]) * 255;
-            result[nid + 1] = clamp01(texture[id + 1]) * 255;
-            result[nid + 2] = clamp01(texture[id + 2]) * 255;
-            result[nid + 3] = clamp01(texture[id + 3]) * 255;
-            id += 4;
-        }
-    }
-    return result;
-}
 
-function clamp01 (input) {
-    return Math.min(Math.max(input, 0), 1);
-}
 
-function textureToCanvas (texture, width, height) {
-    let captureCanvas = document.createElement('canvas');
-    let ctx = captureCanvas.getContext('2d');
-    captureCanvas.width = width;
-    captureCanvas.height = height;
-    //createImageData comes from the canvas 2d api
-    let imageData = ctx.createImageData(width, height);
-    //set data with our texture 
-    imageData.data.set(texture);
-    //render texture to canvas
-    ctx.putImageData(imageData, 0, 0);
 
-    return captureCanvas;
-}
+
+// function textureToCanvas (texture, width, height) {
+//     let captureCanvas = document.createElement('canvas');
+//     let ctx = captureCanvas.getContext('2d');
+//     captureCanvas.width = width;
+//     captureCanvas.height = height;
+//     //createImageData comes from the canvas 2d api
+//     let imageData = ctx.createImageData(width, height);
+//     //set data with our texture 
+//     imageData.data.set(texture);
+//     //render texture to canvas
+//     ctx.putImageData(imageData, 0, 0);
+
+//     return captureCanvas;
+// }
 
 //helper function that creates a temp element on our site 
 //this element is populated with a download link from HTMLCanvasElement.toDataURL()
@@ -461,38 +401,38 @@ function downloadURI (filename, uri) {
     document.body.removeChild(link);
 }
 
-class Material {
-    constructor (vertexShader, fragmentShaderSource) {
-        this.vertexShader = vertexShader;
-        this.fragmentShaderSource = fragmentShaderSource;
-        this.programs = [];
-        this.activeProgram = null;
-        this.uniforms = [];
-    }
+// class Material {
+//     constructor (vertexShader, fragmentShaderSource) {
+//         this.vertexShader = vertexShader;
+//         this.fragmentShaderSource = fragmentShaderSource;
+//         this.programs = [];
+//         this.activeProgram = null;
+//         this.uniforms = [];
+//     }
 
-    setKeywords (keywords) {
-        let hash = 0;
-        for (let i = 0; i < keywords.length; i++)
-            hash += hashCode(keywords[i]);
+//     setKeywords (keywords) {
+//         let hash = 0;
+//         for (let i = 0; i < keywords.length; i++)
+//             hash += hashCode(keywords[i]);
 
-        let program = this.programs[hash];
-        if (program == null)
-        {
-            let fragmentShader = compileShader(gl.FRAGMENT_SHADER, this.fragmentShaderSource, keywords);
-            program = createProgram(this.vertexShader, fragmentShader);
-            this.programs[hash] = program;
-        }
+//         let program = this.programs[hash];
+//         if (program == null)
+//         {
+//             let fragmentShader = compileShader(gl.FRAGMENT_SHADER, this.fragmentShaderSource, keywords);
+//             program = createProgram(this.vertexShader, fragmentShader);
+//             this.programs[hash] = program;
+//         }
 
-        if (program == this.activeProgram) return;
+//         if (program == this.activeProgram) return;
 
-        this.uniforms = getUniforms(program);
-        this.activeProgram = program;
-    }
+//         this.uniforms = getUniforms(program);
+//         this.activeProgram = program;
+//     }
 
-    bind () {
-        gl.useProgram(this.activeProgram);
-    }
-}
+//     bind () {
+//         gl.useProgram(this.activeProgram);
+//     }
+// }
 
 class Program {
     constructor (vertexShader, fragmentShader) {
@@ -1525,7 +1465,7 @@ const noiseProgram              = new Program(baseVertexShader, noiseShader); //
 //create a material from our display shader source to capitalize on the #defines for optimization 
 //TODO - do we have to compile this source differently since there are the defines? 
 //this also allows us to only use the active uniforms 
-const displayMaterial = new Material(baseVertexShader, displayShaderSource);
+const displayMaterial = new LGL.Material(baseVertexShader, displayShaderSource);
 
 
 function initFramebuffers () {
@@ -1752,13 +1692,13 @@ function createTextureAsync (url) {
     return obj;
 }
 
-function updateKeywords () {
-    let displayKeywords = [];
-    if (config.SHADING) displayKeywords.push("SHADING");
-    if (config.BLOOM) displayKeywords.push("BLOOM");
-    if (config.SUNRAYS) displayKeywords.push("SUNRAYS");
-    displayMaterial.setKeywords(displayKeywords);
-}
+// function LGL.updateKeywords () {
+//     let displayKeywords = [];
+//     if (config.SHADING) displayKeywords.push("SHADING");
+//     if (config.BLOOM) displayKeywords.push("BLOOM");
+//     if (config.SUNRAYS) displayKeywords.push("SUNRAYS");
+//     displayMaterial.setKeywords(displayKeywords);
+// }
 
 
 // Draw the scene.
@@ -1839,8 +1779,8 @@ function drawScene(time) {
 
 
 //actually calling our functions to make program work 
-startGUI();
-updateKeywords();
+startGUI(config, initFramebuffers, LGL.updateKeywords, isMobile);
+LGL.updateKeywords(config, displayMaterial);
 initFramebuffers();
 multipleSplats(parseInt(Math.random() * 20) + 5);
 let noiseSeed = 0.0; 
