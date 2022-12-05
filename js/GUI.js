@@ -1,6 +1,6 @@
 import {config} from "./config.js"
 
-export default function startGUI (config, initFramebuffers, updateKeywords, isMobile) {
+export default function startGUI (config, initFramebuffers, updateKeywords) {
     const parName = 'Output Resolution';
     //dat is a library developed by Googles Data Team for building JS interfaces. Needs to be included in project directory 
     var gui = new dat.GUI({ width: 300 });
@@ -100,6 +100,12 @@ function framebufferToTexture (target) {
     return texture;
 }
 
+
+function isMobile () {
+    return /Mobi|Android/i.test(navigator.userAgent);
+}
+
+
 //helper to rerange to integer values on [0,255] and return array of unsigned ints 
 
 function normalizeTexture (texture, width, height) {
@@ -147,6 +153,3 @@ function downloadURI (filename, uri) {
     document.body.removeChild(link);
 }
 
-function isMobile () {
-    return /Mobi|Android/i.test(navigator.userAgent);
-}
