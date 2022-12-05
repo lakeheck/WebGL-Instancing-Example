@@ -567,3 +567,10 @@ export function addKeywords (source, keywords) {
     });
     return keywordsString + source;
 }
+
+export function calcDeltaTime (lastUpdateTime) {
+    let now = Date.now();
+    let dt = (now - lastUpdateTime) / 1000;
+    dt = Math.min(dt, 0.016666); //never want to update slower than 60fps
+    return dt;
+}

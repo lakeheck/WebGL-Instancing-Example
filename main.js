@@ -453,7 +453,7 @@ update();
 //simulation step 
 function update () {
     //time step 
-    const dt = calcDeltaTime();
+    const dt = LGL.calcDeltaTime(lastUpdateTime);
     noiseSeed += dt * config.NOISE_TRANSLATE_SPEED;
     // if (resizeCanvas()) //resize if needed 
     //     initFramebuffers();
@@ -463,15 +463,10 @@ function update () {
         step(dt); //do a calculation step 
     render(null);
     requestAnimationFrame(update);
+    lastUpdateTime = Date.now();
+
 }
 
-function calcDeltaTime () {
-    let now = Date.now();
-    let dt = (now - lastUpdateTime) / 1000;
-    dt = Math.min(dt, 0.016666); //never want to update slower than 60fps
-    lastUpdateTime = now;
-    return dt;
-}
 
 function resizeCanvas () {
     let width = scaleByPixelRatio(canvas.clientWidth);
