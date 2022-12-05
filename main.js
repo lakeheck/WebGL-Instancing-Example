@@ -1,14 +1,11 @@
 "use strict";
-import Parameters from "./js/config.js"
+import {config} from "./js/config.js"
 import startGUI from "./js/GUI.js";
 import {gl, ext, canvas} from "./js/WebGL.js";
 import * as LGL from "./js/WebGL.js";
 
 
 resizeCanvas();
-
-
-let config = Parameters();
 
 
 //create a prototype data structure for our pointers (ie a click or touch)

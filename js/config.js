@@ -1,5 +1,4 @@
-export default function Parameters(){
-    return {
+export const config = {
     SIM_RESOLUTION: 256, //simres
     DYE_RESOLUTION: 1024, //output res 
     ASPECT: 1.0,
@@ -43,4 +42,3 @@ export default function Parameters(){
     NOISE_TRANSLATE_SPEED: 0.15,
     DISPLAY_FLUID: true
     };
-}

@@ -1,3 +1,4 @@
+import {config} from "./config.js"
 
 export default function startGUI (config, initFramebuffers, updateKeywords, isMobile) {
     const parName = 'Output Resolution';
