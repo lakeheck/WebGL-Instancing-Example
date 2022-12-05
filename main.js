@@ -1436,14 +1436,14 @@ let picture = createTextureAsync('img/flowers_fence.JPG');
 // console.log('loaded picture successfully');
 
 //create all our shader programs 
-const blurProgram               = new LGL.Program(GLSL.blurVertexShader, blurShader);
-const copyProgram               = new LGL.Program(GLSL.baseVertexShader, copyShader);
-const clearProgram              = new LGL.Program(GLSL.baseVertexShader, clearShader);
-const colorProgram              = new LGL.Program(GLSL.baseVertexShader, colorShader);
-const checkerboardProgram       = new LGL.Program(GLSL.baseVertexShader, checkerboardShader);
-const bloomPrefilterProgram     = new LGL.Program(GLSL.baseVertexShader, bloomPrefilterShader);
-const bloomBlurProgram          = new LGL.Program(GLSL.baseVertexShader, bloomBlurShader);
-const bloomFinalProgram         = new LGL.Program(GLSL.baseVertexShader, bloomFinalShader);
+const blurProgram               = new LGL.Program(GLSL.blurVertexShader, GLSL.blurShader);
+const copyProgram               = new LGL.Program(GLSL.baseVertexShader, GLSL.copyShader);
+const clearProgram              = new LGL.Program(GLSL.baseVertexShader, GLSL.clearShader);
+const colorProgram              = new LGL.Program(GLSL.baseVertexShader, GLSL.colorShader);
+const checkerboardProgram       = new LGL.Program(GLSL.baseVertexShader, GLSL.checkerboardShader);
+const bloomPrefilterProgram     = new LGL.Program(GLSL.baseVertexShader, GLSL.bloomPrefilterShader);
+const bloomBlurProgram          = new LGL.Program(GLSL.baseVertexShader, GLSL.bloomBlurShader);
+const bloomFinalProgram         = new LGL.Program(GLSL.baseVertexShader, GLSL.bloomFinalShader);
 const sunraysMaskProgram        = new LGL.Program(GLSL.baseVertexShader, sunraysMaskShader);
 const sunraysProgram            = new LGL.Program(GLSL.baseVertexShader, sunraysShader);
 const splatProgram              = new LGL.Program(GLSL.baseVertexShader, splatShader);

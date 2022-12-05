@@ -69,6 +69,7 @@ export default function startGUI (config, initFramebuffers, updateKeywords, isMo
     if (isMobile())
         gui.close();
 
+    gui.close();
     return gui;
 }
 
