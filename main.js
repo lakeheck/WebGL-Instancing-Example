@@ -1491,7 +1491,7 @@ let bloomFramebuffers = [];
 let sunrays;
 let sunraysTemp;
 let noise;
-
+let input;
 //load texture for dithering
 let ditheringTexture = createTextureAsync('LDR_LLL1_0.png');
 let picture = createTextureAsync('img/flowers_fence.JPG');
@@ -1559,8 +1559,10 @@ function initFramebuffers () {
     divergence = createFBO      (simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
     curl       = createFBO      (simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
     pressure   = createDoubleFBO(simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
+    input      = createFBOwithTexture      (dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering, picture.texture);
     // noise       = createFBO      (simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
     //setup buffers for post process 
+    // input=picture;
     initBloomFramebuffers();
     initSunraysFramebuffers();
 }
@@ -1605,6 +1607,39 @@ function initSunraysFramebuffers () {
 function createFBO (w, h, internalFormat, format, type, param) {
     gl.activeTexture(gl.TEXTURE0);
     let texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, w, h, 0, format, type, null);
+
+    let fbo = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+    gl.viewport(0, 0, w, h);
+    gl.clear(gl.COLOR_BUFFER_BIT); //can also clear depth or stencil buffers 
+
+    let texelSizeX = 1.0 / w;
+    let texelSizeY = 1.0 / h;
+
+    return {
+        texture,
+        fbo,
+        width: w,
+        height: h,
+        texelSizeX,
+        texelSizeY,
+        attach (id) { //assigns textures to entries in the txture buffer array (like sTD2DInputs[...])
+            gl.activeTexture(gl.TEXTURE0 + id);
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            return id;
+        }
+    };
+}
+
+function createFBOwithTexture (w, h, internalFormat, format, type, param, texture) {
+    gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
@@ -1795,25 +1830,25 @@ function drawScene(time) {
         
         // Draw the geometry.
         gl.drawElements(gl.TRIANGLES, bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
+        blit(input);
     });
-
-
+    
     //// THINK I JUST NEED TO REPLACE THE BELOW WITH THE FLUID SIM CODE ..... ???
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
     // render the cube with the texture we just rendered to
-    gl.bindTexture(gl.TEXTURE_2D, targetTexture);
+    // gl.bindTexture(gl.TEXTURE_2D, targetTexture);
 
-    // Tell WebGL how to convert from clip space to pixels
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    // // Tell WebGL how to convert from clip space to pixels
+    // gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-    // Clear the canvas AND the depth buffer.
-    gl.clearColor(1, 1, 1, 1);   // clear to white
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    // // Clear the canvas AND the depth buffer.
+    // gl.clearColor(1, 1, 1, 1);   // clear to white
+    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
-    drawCube(aspect);
+    // drawCube(aspect);
 
     requestAnimationFrame(drawScene);
 }
@@ -1827,8 +1862,8 @@ multipleSplats(parseInt(Math.random() * 20) + 5);
 let noiseSeed = 0.0; 
 let lastUpdateTime = Date.now();
 let colorUpdateTimer = 0.0;
+drawScene();
 update();
-// drawScene();
 
 
 //simulation step 
@@ -1955,7 +1990,7 @@ function step (dt) {
         splatVelProgram.bind();
         gl.uniform1i(splatVelProgram.uniforms.uTarget, velocity.read.attach(0)); 
         // gl.uniform1i(splatVelProgram.uniforms.uTarget, velocity.read.attach(0));
-        gl.uniform1i(splatVelProgram.uniforms.uDensityMap, picture.attach(1)); //density map
+        gl.uniform1i(splatVelProgram.uniforms.uDensityMap, input.attach(1)); //density map
         gl.uniform1i(splatVelProgram.uniforms.uForceMap, noise.read.attach(2)); //add noise for velocity map 
         gl.uniform1f(splatVelProgram.uniforms.aspectRatio, canvas.width / canvas.height);
         gl.uniform1f(splatVelProgram.uniforms.uVelocityScale, config.VELOCITYSCALE);
@@ -1973,8 +2008,8 @@ function step (dt) {
         gl.uniform1f(splatColorProgram.uniforms.aspectRatio, canvas.width / canvas.height);
         gl.uniform2f(splatColorProgram.uniforms.point, 0, 0);
         gl.uniform1i(splatColorProgram.uniforms.uTarget, dye.read.attach(0));
-        gl.uniform1i(splatColorProgram.uniforms.uColor, picture.attach(1)); //color map
-        gl.uniform1i(splatColorProgram.uniforms.uDensityMap, picture.attach(2)); //density map
+        gl.uniform1i(splatColorProgram.uniforms.uColor, input.attach(1)); //color map
+        gl.uniform1i(splatColorProgram.uniforms.uDensityMap, input.attach(2)); //density map
         gl.uniform1i(splatVelProgram.uniforms.uClick, 0);
         gl.uniform1f(splatColorProgram.uniforms.radius, correctRadius(config.SPLAT_RADIUS / 100.0));
         blit(dye.write);
@@ -2179,7 +2214,7 @@ function splat (x, y, dx, dy, color) {
     gl.uniform1f(splatColorClickProgram.uniforms.aspectRatio, canvas.width / canvas.height);
     gl.uniform2f(splatColorClickProgram.uniforms.point, x, y);
     gl.uniform1i(splatColorClickProgram.uniforms.uTarget, dye.read.attach(0));
-    gl.uniform1i(splatColorClickProgram.uniforms.uColor, picture.attach(1));
+    gl.uniform1i(splatColorClickProgram.uniforms.uColor, input.attach(1));
     gl.uniform1f(splatColorClickProgram.uniforms.radius, correctRadius(config.SPLAT_RADIUS / 100.0));
     blit(dye.write);
     dye.swap();
