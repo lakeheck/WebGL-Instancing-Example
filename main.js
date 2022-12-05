@@ -1444,19 +1444,19 @@ const checkerboardProgram       = new LGL.Program(GLSL.baseVertexShader, GLSL.ch
 const bloomPrefilterProgram     = new LGL.Program(GLSL.baseVertexShader, GLSL.bloomPrefilterShader);
 const bloomBlurProgram          = new LGL.Program(GLSL.baseVertexShader, GLSL.bloomBlurShader);
 const bloomFinalProgram         = new LGL.Program(GLSL.baseVertexShader, GLSL.bloomFinalShader);
-const sunraysMaskProgram        = new LGL.Program(GLSL.baseVertexShader, sunraysMaskShader);
-const sunraysProgram            = new LGL.Program(GLSL.baseVertexShader, sunraysShader);
-const splatProgram              = new LGL.Program(GLSL.baseVertexShader, splatShader);
-const splatColorClickProgram    = new LGL.Program(GLSL.baseVertexShader, splatColorClickShader);
-const splatVelProgram           = new LGL.Program(GLSL.baseVertexShader, splatVelShader); //added to support color / vel map
-const splatColorProgram         = new LGL.Program(GLSL.baseVertexShader, splatColorShader); //added to support color / vel map
-const advectionProgram          = new LGL.Program(GLSL.baseVertexShader, advectionShader);
-const divergenceProgram         = new LGL.Program(GLSL.baseVertexShader, divergenceShader);
-const curlProgram               = new LGL.Program(GLSL.baseVertexShader, curlShader);
-const vorticityProgram          = new LGL.Program(GLSL.baseVertexShader, vorticityShader);
-const pressureProgram           = new LGL.Program(GLSL.baseVertexShader, pressureShader);
-const gradientSubtractProgram   = new LGL.Program(GLSL.baseVertexShader, gradientSubtractShader);
-const noiseProgram              = new LGL.Program(GLSL.baseVertexShader, noiseShader); //noise generator 
+const sunraysMaskProgram        = new LGL.Program(GLSL.baseVertexShader, GLSL.sunraysMaskShader);
+const sunraysProgram            = new LGL.Program(GLSL.baseVertexShader, GLSL.sunraysShader);
+const splatProgram              = new LGL.Program(GLSL.baseVertexShader, GLSL.splatShader);
+const splatColorClickProgram    = new LGL.Program(GLSL.baseVertexShader, GLSL.splatColorClickShader);
+const splatVelProgram           = new LGL.Program(GLSL.baseVertexShader, GLSL.splatVelShader); //added to support color / vel map
+const splatColorProgram         = new LGL.Program(GLSL.baseVertexShader, GLSL.splatColorShader); //added to support color / vel map
+const advectionProgram          = new LGL.Program(GLSL.baseVertexShader, GLSL.advectionShader);
+const divergenceProgram         = new LGL.Program(GLSL.baseVertexShader, GLSL.divergenceShader);
+const curlProgram               = new LGL.Program(GLSL.baseVertexShader, GLSL.curlShader);
+const vorticityProgram          = new LGL.Program(GLSL.baseVertexShader, GLSL.vorticityShader);
+const pressureProgram           = new LGL.Program(GLSL.baseVertexShader, GLSL.pressureShader);
+const gradientSubtractProgram   = new LGL.Program(GLSL.baseVertexShader, GLSL.gradientSubtractShader);
+const noiseProgram              = new LGL.Program(GLSL.baseVertexShader, GLSL.noiseShader); //noise generator 
 
 
 //create a material from our display shader source to capitalize on the #defines for optimization 
