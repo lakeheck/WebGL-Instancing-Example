@@ -2041,6 +2041,9 @@ function render (target) {
         drawColor(target, normalizeColor(config.BACK_COLOR));
         if (target == null && config.TRANSPARENT)
         drawCheckerboard(target);
+
+        // dye.read = input;//kinda cool, this will essentially apply fliud sim to next frame, not both frames
+        // dye.write = input;//set write to input, with both this is like feedback without decay
         if(config.DISPLAY_FLUID){
             drawDisplay(target);
         }
