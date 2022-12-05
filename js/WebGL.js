@@ -574,3 +574,14 @@ export function calcDeltaTime (lastUpdateTime) {
     dt = Math.min(dt, 0.016666); //never want to update slower than 60fps
     return dt;
 }
+
+export function resizeCanvas () {
+    let width = scaleByPixelRatio(canvas.clientWidth);
+    let height = scaleByPixelRatio(canvas.clientHeight);
+    if (canvas.width != width || canvas.height != height) {
+        canvas.width = width;
+        canvas.height = height;
+        return true;
+    }
+    return false;
+}

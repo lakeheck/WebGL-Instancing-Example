@@ -5,7 +5,7 @@ import {gl, ext, canvas} from "./js/WebGL.js";
 import * as LGL from "./js/WebGL.js";
 import * as GLSL from "./js/Shaders.js";
 
-resizeCanvas();
+LGL.resizeCanvas();
 
 
 //create a prototype data structure for our pointers (ie a click or touch)
@@ -365,7 +365,7 @@ function initSunraysFramebuffers () {
 function drawScene(time) {
     time = time * 0.0001 + 5;
 
-    // resizeCanvasToDisplaySize(gl.canvas);
+    // LGL.resizeCanvasToDisplaySize(gl.canvas);
 
     // Tell WebGL how to convert from clip space to pixels
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
@@ -455,7 +455,7 @@ function update () {
     //time step 
     const dt = LGL.calcDeltaTime(lastUpdateTime);
     noiseSeed += dt * config.NOISE_TRANSLATE_SPEED;
-    // if (resizeCanvas()) //resize if needed 
+    // if (LGL.resizeCanvas()) //resize if needed 
     //     initFramebuffers();
     updateColors(dt); //step through our sim 
     applyInputs(); //take from ui
@@ -467,17 +467,6 @@ function update () {
 
 }
 
-
-function resizeCanvas () {
-    let width = scaleByPixelRatio(canvas.clientWidth);
-    let height = scaleByPixelRatio(canvas.clientHeight);
-    if (canvas.width != width || canvas.height != height) {
-        canvas.width = width;
-        canvas.height = height;
-        return true;
-    }
-    return false;
-}
 
 
 function updateColors (dt) {//used to update the color map for each pointer, which happens slower than the entire sim updates 
