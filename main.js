@@ -244,68 +244,68 @@ function resizeCanvasToDisplaySize(canvas) {
 
     return needResize;
 }
-// function drawCube(aspect) {
-//     // Tell it to use our boxProgram (pair of shaders)
-//     gl.useProgram(boxProgram.program);
+function drawCube(aspect) {
+    // Tell it to use our boxProgram (pair of shaders)
+    gl.useProgram(boxProgram.program);
 
-//     // Turn on the position attribute
-//     gl.enableVertexAttribArray(positionLocation);
+    // Turn on the position attribute
+    gl.enableVertexAttribArray(positionLocation);
 
-//     // Bind the position buffer.
-//     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    // Bind the position buffer.
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-//     // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-//     var size = 3;          // 3 components per iteration
-//     var type = gl.FLOAT;   // the data is 32bit floats
-//     var normalize = false; // don't normalize the data
-//     var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-//     var offset = 0;        // start at the beginning of the buffer
-//     gl.vertexAttribPointer(
-//         positionLocation, size, type, normalize, stride, offset);
+    // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+    var size = 3;          // 3 components per iteration
+    var type = gl.FLOAT;   // the data is 32bit floats
+    var normalize = false; // don't normalize the data
+    var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+    var offset = 0;        // start at the beginning of the buffer
+    gl.vertexAttribPointer(
+        positionLocation, size, type, normalize, stride, offset);
 
-//     // Turn on the texcoord attribute
-//     gl.enableVertexAttribArray(texcoordLocation);
+    // Turn on the texcoord attribute
+    gl.enableVertexAttribArray(texcoordLocation);
 
-//     // bind the texcoord buffer.
-//     gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
+    // bind the texcoord buffer.
+    gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
 
-//     // Tell the texcoord attribute how to get data out of texcoordBuffer (ARRAY_BUFFER)
-//     var size = 2;          // 2 components per iteration
-//     var type = gl.FLOAT;   // the data is 32bit floats
-//     var normalize = false; // don't normalize the data
-//     var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-//     var offset = 0;        // start at the beginning of the buffer
-//     gl.vertexAttribPointer(
-//         texcoordLocation, size, type, normalize, stride, offset);
+    // Tell the texcoord attribute how to get data out of texcoordBuffer (ARRAY_BUFFER)
+    var size = 2;          // 2 components per iteration
+    var type = gl.FLOAT;   // the data is 32bit floats
+    var normalize = false; // don't normalize the data
+    var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+    var offset = 0;        // start at the beginning of the buffer
+    gl.vertexAttribPointer(
+        texcoordLocation, size, type, normalize, stride, offset);
 
-//     // Compute the projection matrix
-//     var projectionMatrix =
-//         m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
+    // Compute the projection matrix
+    var projectionMatrix =
+        m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
 
-//     var cameraPosition = [0, 0, 2];
-//     var up = [0, 1, 0];
-//     var target = [0, 0, 0];
+    var cameraPosition = [0, 0, 2];
+    var up = [0, 1, 0];
+    var target = [0, 0, 0];
 
-//     // Compute the camera's matrix using look at.
-//     var cameraMatrix = m4.lookAt(cameraPosition, target, up);
+    // Compute the camera's matrix using look at.
+    var cameraMatrix = m4.lookAt(cameraPosition, target, up);
 
-//     // Make a view matrix from the camera matrix.
-//     var viewMatrix = m4.inverse(cameraMatrix);
+    // Make a view matrix from the camera matrix.
+    var viewMatrix = m4.inverse(cameraMatrix);
 
-//     var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
+    var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
 
-//     var matrix = m4.xRotate(viewProjectionMatrix, modelXRotationRadians);
-//     matrix = m4.yRotate(matrix, modelYRotationRadians);
+    var matrix = m4.xRotate(viewProjectionMatrix, modelXRotationRadians);
+    matrix = m4.yRotate(matrix, modelYRotationRadians);
 
-//     // Set the matrix.
-//     gl.uniformMatrix4fv(matrixLocation, false, matrix);
+    // Set the matrix.
+    gl.uniformMatrix4fv(matrixLocation, false, matrix);
 
-//     // Tell the shader to use texture unit 0 for u_texture
-//     gl.uniform1i(textureLocation, 0);
+    // Tell the shader to use texture unit 0 for u_texture
+    gl.uniform1i(textureLocation, 0);
 
-//     // Draw the geometry.
-//     gl.drawArrays(gl.TRIANGLES, 0, 6 * 6);
-//   }
+    // Draw the geometry.
+    gl.drawArrays(gl.TRIANGLES, 0, 6 * 6);
+  }
 
 
   function startGUI () {
@@ -1727,96 +1727,96 @@ function updateKeywords () {
 
 
 // Draw the scene.
-// function drawScene(time) {
-//     time = time * 0.0001 + 5;
+function drawScene(time) {
+    time = time * 0.0001 + 5;
 
-//     resizeCanvasToDisplaySize(gl.canvas);
+    resizeCanvasToDisplaySize(gl.canvas);
 
-//     // Tell WebGL how to convert from clip space to pixels
-//     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    // Tell WebGL how to convert from clip space to pixels
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-//     // Clear the canvas AND the depth buffer.
-//     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    // Clear the canvas AND the depth buffer.
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-//     // Compute the projection matrix
-//     var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-//     var projectionMatrix =
-//         m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
+    // Compute the projection matrix
+    var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    var projectionMatrix =
+        m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
 
-//     // Compute the camera's matrix using look at.
-//     var cameraPosition = [0, 0, 100];
-//     var target = [0, 0, 0];
-//     var up = [0, 1, 0];
-//     var cameraMatrix = m4.lookAt(cameraPosition, target, up, uniformsThatAreTheSameForAllObjects.u_viewInverse);
+    // Compute the camera's matrix using look at.
+    var cameraPosition = [0, 0, 100];
+    var target = [0, 0, 0];
+    var up = [0, 1, 0];
+    var cameraMatrix = m4.lookAt(cameraPosition, target, up, uniformsThatAreTheSameForAllObjects.u_viewInverse);
 
-//     // Make a view matrix from the camera matrix.
-//     var viewMatrix = m4.inverse(cameraMatrix);
+    // Make a view matrix from the camera matrix.
+    var viewMatrix = m4.inverse(cameraMatrix);
 
-//     var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
+    var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
 
-//     gl.useProgram(programInfo.program);
+    gl.useProgram(programInfo.program);
 
-//     // Setup all the needed buffers and attributes.
-//     webglUtils.setBuffersAndAttributes(gl, programInfo, bufferInfo);
+    // Setup all the needed buffers and attributes.
+    webglUtils.setBuffersAndAttributes(gl, programInfo, bufferInfo);
 
-//     // Set the uniforms that are the same for all objects.
-//     webglUtils.setUniforms(programInfo, uniformsThatAreTheSameForAllObjects);
+    // Set the uniforms that are the same for all objects.
+    webglUtils.setUniforms(programInfo, uniformsThatAreTheSameForAllObjects);
     
-//     gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
     
-//     // render cube with our 3x2 texture
-//     gl.bindTexture(gl.TEXTURE_2D, texture);
+    // render cube with our 3x2 texture
+    gl.bindTexture(gl.TEXTURE_2D, texture);
     
-//     // Tell WebGL how to convert from clip space to pixels
-//     gl.viewport(0, 0, targetTextureWidth, targetTextureHeight);
+    // Tell WebGL how to convert from clip space to pixels
+    gl.viewport(0, 0, targetTextureWidth, targetTextureHeight);
     
-//     // Clear the attachment(s).
-//     gl.clearColor(0, 0, 1, 1);   // clear to blue
-//     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    // Clear the attachment(s).
+    gl.clearColor(0, 0, 1, 1);   // clear to blue
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
-//     // Draw objects
-//     objects.forEach(function(object) {
+    // Draw objects
+    objects.forEach(function(object) {
 
-//         // Compute a position for this object based on the time.
-//         var worldMatrix = m4.xRotation(object.xRotation * time);
-//         worldMatrix = m4.yRotate(worldMatrix, object.yRotation * time);
-//         worldMatrix = m4.translate(worldMatrix, 0, 0, object.radius);
-//         uniformsThatAreComputedForEachObject.u_world = worldMatrix;
+        // Compute a position for this object based on the time.
+        var worldMatrix = m4.xRotation(object.xRotation * time);
+        worldMatrix = m4.yRotate(worldMatrix, object.yRotation * time);
+        worldMatrix = m4.translate(worldMatrix, 0, 0, object.radius);
+        uniformsThatAreComputedForEachObject.u_world = worldMatrix;
 
-//         // Multiply the matrices.
-//         m4.multiply(viewProjectionMatrix, worldMatrix, uniformsThatAreComputedForEachObject.u_worldViewProjection);
-//         m4.transpose(m4.inverse(worldMatrix), uniformsThatAreComputedForEachObject.u_worldInverseTranspose);
+        // Multiply the matrices.
+        m4.multiply(viewProjectionMatrix, worldMatrix, uniformsThatAreComputedForEachObject.u_worldViewProjection);
+        m4.transpose(m4.inverse(worldMatrix), uniformsThatAreComputedForEachObject.u_worldInverseTranspose);
 
-//         // Set the uniforms we just computed
-//         webglUtils.setUniforms(programInfo, uniformsThatAreComputedForEachObject);
+        // Set the uniforms we just computed
+        webglUtils.setUniforms(programInfo, uniformsThatAreComputedForEachObject);
 
-//         // Set the uniforms that are specific to the this object.
-//         webglUtils.setUniforms(programInfo, object.materialUniforms);
+        // Set the uniforms that are specific to the this object.
+        webglUtils.setUniforms(programInfo, object.materialUniforms);
         
-//         // Draw the geometry.
-//         gl.drawElements(gl.TRIANGLES, bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
-//     });
+        // Draw the geometry.
+        gl.drawElements(gl.TRIANGLES, bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
+    });
 
 
-//     //// THINK I JUST NEED TO REPLACE THE BELOW WITH THE FLUID SIM CODE ..... ???
+    //// THINK I JUST NEED TO REPLACE THE BELOW WITH THE FLUID SIM CODE ..... ???
 
-//     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-//     // render the cube with the texture we just rendered to
-//     gl.bindTexture(gl.TEXTURE_2D, targetTexture);
+    // render the cube with the texture we just rendered to
+    gl.bindTexture(gl.TEXTURE_2D, targetTexture);
 
-//     // Tell WebGL how to convert from clip space to pixels
-//     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    // Tell WebGL how to convert from clip space to pixels
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-//     // Clear the canvas AND the depth buffer.
-//     gl.clearColor(1, 1, 1, 1);   // clear to white
-//     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    // Clear the canvas AND the depth buffer.
+    gl.clearColor(1, 1, 1, 1);   // clear to white
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
-//     drawCube(aspect);
+    drawCube(aspect);
 
-//     requestAnimationFrame(drawScene);
-// }
+    requestAnimationFrame(drawScene);
+}
 
 
 //actually calling our functions to make program work 
