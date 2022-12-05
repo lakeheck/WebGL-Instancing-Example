@@ -1436,27 +1436,27 @@ let picture = createTextureAsync('img/flowers_fence.JPG');
 // console.log('loaded picture successfully');
 
 //create all our shader programs 
-const blurProgram               = new Program(blurVertexShader, blurShader);
-const copyProgram               = new Program(baseVertexShader, copyShader);
-const clearProgram              = new Program(baseVertexShader, clearShader);
-const colorProgram              = new Program(baseVertexShader, colorShader);
-const checkerboardProgram       = new Program(baseVertexShader, checkerboardShader);
-const bloomPrefilterProgram     = new Program(baseVertexShader, bloomPrefilterShader);
-const bloomBlurProgram          = new Program(baseVertexShader, bloomBlurShader);
-const bloomFinalProgram         = new Program(baseVertexShader, bloomFinalShader);
-const sunraysMaskProgram        = new Program(baseVertexShader, sunraysMaskShader);
-const sunraysProgram            = new Program(baseVertexShader, sunraysShader);
-const splatProgram              = new Program(baseVertexShader, splatShader);
-const splatColorClickProgram    = new Program(baseVertexShader, splatColorClickShader);
-const splatVelProgram           = new Program(baseVertexShader, splatVelShader); //added to support color / vel map
-const splatColorProgram         = new Program(baseVertexShader, splatColorShader); //added to support color / vel map
-const advectionProgram          = new Program(baseVertexShader, advectionShader);
-const divergenceProgram         = new Program(baseVertexShader, divergenceShader);
-const curlProgram               = new Program(baseVertexShader, curlShader);
-const vorticityProgram          = new Program(baseVertexShader, vorticityShader);
-const pressureProgram           = new Program(baseVertexShader, pressureShader);
-const gradientSubtractProgram   = new Program(baseVertexShader, gradientSubtractShader);
-const noiseProgram              = new Program(baseVertexShader, noiseShader); //noise generator 
+const blurProgram               = new LGL.Program(blurVertexShader, blurShader);
+const copyProgram               = new LGL.Program(baseVertexShader, copyShader);
+const clearProgram              = new LGL.Program(baseVertexShader, clearShader);
+const colorProgram              = new LGL.Program(baseVertexShader, colorShader);
+const checkerboardProgram       = new LGL.Program(baseVertexShader, checkerboardShader);
+const bloomPrefilterProgram     = new LGL.Program(baseVertexShader, bloomPrefilterShader);
+const bloomBlurProgram          = new LGL.Program(baseVertexShader, bloomBlurShader);
+const bloomFinalProgram         = new LGL.Program(baseVertexShader, bloomFinalShader);
+const sunraysMaskProgram        = new LGL.Program(baseVertexShader, sunraysMaskShader);
+const sunraysProgram            = new LGL.Program(baseVertexShader, sunraysShader);
+const splatProgram              = new LGL.Program(baseVertexShader, splatShader);
+const splatColorClickProgram    = new LGL.Program(baseVertexShader, splatColorClickShader);
+const splatVelProgram           = new LGL.Program(baseVertexShader, splatVelShader); //added to support color / vel map
+const splatColorProgram         = new LGL.Program(baseVertexShader, splatColorShader); //added to support color / vel map
+const advectionProgram          = new LGL.Program(baseVertexShader, advectionShader);
+const divergenceProgram         = new LGL.Program(baseVertexShader, divergenceShader);
+const curlProgram               = new LGL.Program(baseVertexShader, curlShader);
+const vorticityProgram          = new LGL.Program(baseVertexShader, vorticityShader);
+const pressureProgram           = new LGL.Program(baseVertexShader, pressureShader);
+const gradientSubtractProgram   = new LGL.Program(baseVertexShader, gradientSubtractShader);
+const noiseProgram              = new LGL.Program(baseVertexShader, noiseShader); //noise generator 
 
 
 //create a material from our display shader source to capitalize on the #defines for optimization 

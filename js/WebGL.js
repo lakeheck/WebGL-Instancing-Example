@@ -48,8 +48,28 @@ export class Program {
     }
 }
 
+const baseVertexShader = compileShader(gl.VERTEX_SHADER, `
+    precision highp float;
 
-function getSupportedFormat (gl, internalFormat, format, type)
+    attribute vec2 aPosition;
+    varying vec2 vUv;
+    varying vec2 vL;
+    varying vec2 vR;
+    varying vec2 vT;
+    varying vec2 vB;
+    uniform vec2 texelSize;
+
+    void main () {
+        vUv = aPosition * 0.5 + 0.5;
+        vL = vUv - vec2(texelSize.x, 0.0);
+        vR = vUv + vec2(texelSize.x, 0.0);
+        vT = vUv + vec2(0.0, texelSize.y);
+        vB = vUv - vec2(0.0, texelSize.y);
+        gl_Position = vec4(aPosition, 0.0, 1.0);
+    }
+`);
+
+export function getSupportedFormat (gl, internalFormat, format, type)
 {
     if (!supportRenderTextureFormat(gl, internalFormat, format, type))
     {
@@ -70,7 +90,7 @@ function getSupportedFormat (gl, internalFormat, format, type)
     }
 }
 
-function CHECK_FRAMEBUFFER_STATUS () {
+export function CHECK_FRAMEBUFFER_STATUS () {
     let status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
     if (status != gl.FRAMEBUFFER_COMPLETE)
         console.trace("Framebuffer error: " + status);
@@ -134,7 +154,7 @@ export const blit = (() => {
 //create a frame buffer and bind the texture to it 
 //check tosee if the buffer object correctly accepcted texture 
 //TODO - enhance understanding of texture setup 
-function supportRenderTextureFormat (gl, internalFormat, format, type) {
+export function supportRenderTextureFormat (gl, internalFormat, format, type) {
     let texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -152,7 +172,7 @@ function supportRenderTextureFormat (gl, internalFormat, format, type) {
 }
 
 
-function getWebGLContext (canvas) {
+export function getWebGLContext (canvas) {
     const params = { alpha: true, depth: false, stencil: false, antialias: false, preserveDrawingBuffer: false };
 
     //get webgl context. note webgl2
@@ -204,7 +224,7 @@ function getWebGLContext (canvas) {
     };
 }
 
-function hashCode (s) {
+export function hashCode (s) {
     if (s.length == 0) return 0;
     let hash = 0;
     for (let i = 0; i < s.length; i++) {
@@ -214,7 +234,7 @@ function hashCode (s) {
     return hash;
 };
 
-function updatePointerDownData (pointer, id, posX, posY) {
+export function updatePointerDownData (pointer, id, posX, posY) {
     pointer.id = id;
     pointer.down = true;
     pointer.moved = false;
@@ -227,7 +247,7 @@ function updatePointerDownData (pointer, id, posX, posY) {
     pointer.color = generateColor();
 }
 
-function updatePointerMoveData (pointer, posX, posY) {
+export function updatePointerMoveData (pointer, posX, posY) {
     pointer.prevTexcoordX = pointer.texcoordX;
     pointer.prevTexcoordY = pointer.texcoordY;
     pointer.texcoordX = posX / canvas.width;
@@ -237,23 +257,23 @@ function updatePointerMoveData (pointer, posX, posY) {
     pointer.moved = Math.abs(pointer.deltaX) > 0 || Math.abs(pointer.deltaY) > 0;
 }
 
-function updatePointerUpData (pointer) {
+export function updatePointerUpData (pointer) {
     pointer.down = false;
 }
 
-function correctDeltaX (delta) {
+export function correctDeltaX (delta) {
     let aspectRatio = canvas.width / canvas.height;
     if (aspectRatio < 1) delta *= aspectRatio;
     return delta;
 }
 
-function correctDeltaY (delta) {
+export function correctDeltaY (delta) {
     let aspectRatio = canvas.width / canvas.height;
     if (aspectRatio > 1) delta /= aspectRatio;
     return delta;
 }
 
-function generateColor () {
+export function generateColor () {
     let c = HSVtoRGB(Math.random(), 1.0, 1.0);
     c.r *= 0.15;
     c.g *= 0.15;
@@ -261,7 +281,7 @@ function generateColor () {
     return c;
 }
 
-function HSVtoRGB (h, s, v) {
+export function HSVtoRGB (h, s, v) {
     let r, g, b, i, f, p, q, t;
     i = Math.floor(h * 6);
     f = h * 6 - i;
@@ -285,7 +305,7 @@ function HSVtoRGB (h, s, v) {
     };
 }
 
-function normalizeColor (input) {
+export function normalizeColor (input) {
     let output = {
         r: input.r / 255,
         g: input.g / 255,
@@ -294,13 +314,13 @@ function normalizeColor (input) {
     return output;
 }
 
-function wrap (value, min, max) {
+export function wrap (value, min, max) {
     let range = max - min;
     if (range == 0) return min;
     return (value - min) % range + min;
 }
 
-function getResolution (resolution) {
+export function getResolution (resolution) {
     let aspectRatio = gl.drawingBufferWidth / gl.drawingBufferHeight;
     if (aspectRatio < 1)
         aspectRatio = 1.0 / aspectRatio;
@@ -314,26 +334,26 @@ function getResolution (resolution) {
         return { width: min, height: max };
 }
 
-function getTextureScale (texture, width, height) {
+export function getTextureScale (texture, width, height) {
     return {
         x: width / texture.width,
         y: height / texture.height
     };
 }
 
-function scaleByPixelRatio (input) {
+export function scaleByPixelRatio (input) {
     let pixelRatio = window.devicePixelRatio || 1;
     return Math.floor(input * pixelRatio);
 }
 
-function correctRadius (radius) {
+export function correctRadius (radius) {
     let aspectRatio = canvas.width / canvas.height;
     if (aspectRatio > 1)
         radius *= aspectRatio;
     return radius;
 }
 
-function resizeFBO (target, w, h, internalFormat, format, type, param) {
+export function resizeFBO (target, w, h, internalFormat, format, type, param) {
     let newFBO = createFBO(w, h, internalFormat, format, type, param);
     copyProgram.bind();
     gl.uniform1i(copyProgram.uniforms.uTexture, target.attach(0));
@@ -341,7 +361,7 @@ function resizeFBO (target, w, h, internalFormat, format, type, param) {
     return newFBO;
 }
 
-function resizeDoubleFBO (target, w, h, internalFormat, format, type, param) {
+export function resizeDoubleFBO (target, w, h, internalFormat, format, type, param) {
     if (target.width == w && target.height == h)
         return target;
     target.read = resizeFBO(target.read, w, h, internalFormat, format, type, param);
@@ -353,7 +373,7 @@ function resizeDoubleFBO (target, w, h, internalFormat, format, type, param) {
     return target;
 }
 
-function createTextureAsync (url) {
+export function createTextureAsync (url) {
     let texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -394,7 +414,7 @@ export function updateKeywords (config, displayMaterial) {
 }
 
 
-function createFBO (w, h, internalFormat, format, type, param) {
+export function createFBO (w, h, internalFormat, format, type, param) {
     gl.activeTexture(gl.TEXTURE0);
     let texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -428,7 +448,7 @@ function createFBO (w, h, internalFormat, format, type, param) {
     };
 }
 
-function createFBOwithTexture (w, h, internalFormat, format, type, param, texture) {
+export function createFBOwithTexture (w, h, internalFormat, format, type, param, texture) {
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
@@ -461,7 +481,7 @@ function createFBOwithTexture (w, h, internalFormat, format, type, param, textur
     };
 }
 
-function createDoubleFBO (w, h, internalFormat, format, type, param) {
+export function createDoubleFBO (w, h, internalFormat, format, type, param) {
     let fbo1 = createFBO(w, h, internalFormat, format, type, param);
     let fbo2 = createFBO(w, h, internalFormat, format, type, param);
 
@@ -490,7 +510,7 @@ function createDoubleFBO (w, h, internalFormat, format, type, param) {
     }
 }
 
-function initBloomFramebuffers () {
+export function initBloomFramebuffers () {
     let res = getResolution(config.BLOOM_RESOLUTION);
 
     const texType = ext.halfFloatTexType;
@@ -517,7 +537,7 @@ function initBloomFramebuffers () {
 }
 
 
-function createProgram (vertexShader, fragmentShader) {
+export function createProgram (vertexShader, fragmentShader) {
     let program = gl.createProgram();
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
@@ -529,7 +549,7 @@ function createProgram (vertexShader, fragmentShader) {
     return program;
 }
 
-function getUniforms (program) {
+export function getUniforms (program) {
     let uniforms = [];
     //get the number of active uniforms in our shader 
     //this helps in optimization because most compilers will "know" to ignore uniforms that are not used to generate output
@@ -549,7 +569,7 @@ function getUniforms (program) {
     return uniforms;
 }
 
-function compileShader (type, source, keywords) {
+export function compileShader (type, source, keywords) {
     source = addKeywords(source, keywords);
 
     const shader = gl.createShader(type);
@@ -563,7 +583,7 @@ function compileShader (type, source, keywords) {
 };
 
 //used in advection shader to assign a keyword in the case that webgl does not natively support linear filtering 
-function addKeywords (source, keywords) {
+export function addKeywords (source, keywords) {
     if (keywords == null) return source;
     let keywordsString = '';
     keywords.forEach(keyword => {
