@@ -196,7 +196,7 @@ const blit = (() => {
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(0);
 
-    //intended to be used with output from createFBO
+    //intended to be used with output from LGL.createFBO
     //if we dont pass a target, then we want to create a viewport with the overall dimensions 
     //otherwise we can take our target dimensions (means we dont have to worry about sim res vs output res here)
     //clear = false is a keyword arguement set to "false" by default 
@@ -298,24 +298,24 @@ function initFramebuffers () {
     //use helper function to create pairs of buffer objects that will be ping pong'd for our sim 
     //this lets us define the buffer objects that we wil want to use for feedback 
     if (dye == null || noise == null){
-        dye = createDoubleFBO(dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
-        noise = createDoubleFBO(dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
+        dye = LGL.createDoubleFBO(dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
+        noise = LGL.createDoubleFBO(dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
     }
     else {//resize if needed 
         dye = resizeDoubleFBO(dye, dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
         noise = resizeDoubleFBO(noise, dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
     }
     if (velocity == null)
-        velocity = createDoubleFBO(simRes.width, simRes.height, rg.internalFormat, rg.format, texType, filtering);
+        velocity = LGL.createDoubleFBO(simRes.width, simRes.height, rg.internalFormat, rg.format, texType, filtering);
     else //resize if needed 
         velocity = resizeDoubleFBO(velocity, simRes.width, simRes.height, rg.internalFormat, rg.format, texType, filtering);
     //other buffer objects that dont need feedback / ping-pong 
     //notice the filtering type is set to gl.NEAREST meaning we grab just a single px, no filtering 
-    divergence = createFBO      (simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
-    curl       = createFBO      (simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
-    pressure   = createDoubleFBO(simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
-    input      = createFBO     (dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
-    // noise       = createFBO      (simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
+    divergence = LGL.createFBO      (simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
+    curl       = LGL.createFBO      (simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
+    pressure   = LGL.createDoubleFBO(simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
+    input      = LGL.createFBO     (dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
+    // noise       = LGL.createFBO      (simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
     //setup buffers for post process 
     // input=picture;
     initBloomFramebuffers();
@@ -329,7 +329,7 @@ function initBloomFramebuffers () {
     const rgba = ext.formatRGBA;
     const filtering = ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST;
 
-    bloom = createFBO(res.width, res.height, rgba.internalFormat, rgba.format, texType, filtering);
+    bloom = LGL.createFBO(res.width, res.height, rgba.internalFormat, rgba.format, texType, filtering);
 
     bloomFramebuffers.length = 0;
     for (let i = 0; i < config.BLOOM_ITERATIONS; i++)
@@ -343,7 +343,7 @@ function initBloomFramebuffers () {
 
         if (width < 2 || height < 2) break;
 
-        let fbo = createFBO(width, height, rgba.internalFormat, rgba.format, texType, filtering);
+        let fbo = LGL.createFBO(width, height, rgba.internalFormat, rgba.format, texType, filtering);
         bloomFramebuffers.push(fbo);
     }
 }
@@ -355,108 +355,15 @@ function initSunraysFramebuffers () {
     const r = ext.formatR;
     const filtering = ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST;
 
-    sunrays     = createFBO(res.width, res.height, r.internalFormat, r.format, texType, filtering);
-    sunraysTemp = createFBO(res.width, res.height, r.internalFormat, r.format, texType, filtering);
+    sunrays     = LGL.createFBO(res.width, res.height, r.internalFormat, r.format, texType, filtering);
+    sunraysTemp = LGL.createFBO(res.width, res.height, r.internalFormat, r.format, texType, filtering);
 }
 
-function createFBO (w, h, internalFormat, format, type, param) {
-    gl.activeTexture(gl.TEXTURE0);
-    let texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, w, h, 0, format, type, null);
 
-    let fbo = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-    gl.viewport(0, 0, w, h);
-    gl.clear(gl.COLOR_BUFFER_BIT); //can also clear depth or stencil buffers 
 
-    let texelSizeX = 1.0 / w;
-    let texelSizeY = 1.0 / h;
-
-    return {
-        texture,
-        fbo,
-        width: w,
-        height: h,
-        texelSizeX,
-        texelSizeY,
-        attach (id) { //assigns textures to entries in the txture buffer array (like sTD2DInputs[...])
-            gl.activeTexture(gl.TEXTURE0 + id);
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-            return id;
-        }
-    };
-}
-
-function createFBOwithTexture (w, h, internalFormat, format, type, param, texture) {
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, w, h, 0, format, type, null);
-
-    let fbo = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-    gl.viewport(0, 0, w, h);
-    gl.clear(gl.COLOR_BUFFER_BIT); //can also clear depth or stencil buffers 
-
-    let texelSizeX = 1.0 / w;
-    let texelSizeY = 1.0 / h;
-
-    return {
-        texture,
-        fbo,
-        width: w,
-        height: h,
-        texelSizeX,
-        texelSizeY,
-        attach (id) { //assigns textures to entries in the txture buffer array (like sTD2DInputs[...])
-            gl.activeTexture(gl.TEXTURE0 + id);
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-            return id;
-        }
-    };
-}
-
-function createDoubleFBO (w, h, internalFormat, format, type, param) {
-    let fbo1 = createFBO(w, h, internalFormat, format, type, param);
-    let fbo2 = createFBO(w, h, internalFormat, format, type, param);
-
-    return {
-        width: w,
-        height: h,
-        texelSizeX: fbo1.texelSizeX,
-        texelSizeY: fbo1.texelSizeY,
-        get read () {
-            return fbo1;
-        },
-        set read (value) {
-            fbo1 = value;
-        },
-        get write () {
-            return fbo2;
-        },
-        set write (value) {
-            fbo2 = value;
-        },
-        swap () {
-            let temp = fbo1;
-            fbo1 = fbo2;
-            fbo2 = temp;
-        }
-    }
-}
 
 function resizeFBO (target, w, h, internalFormat, format, type, param) {
-    let newFBO = createFBO(w, h, internalFormat, format, type, param);
+    let newFBO = LGL.createFBO(w, h, internalFormat, format, type, param);
     copyProgram.bind();
     gl.uniform1i(copyProgram.uniforms.uTexture, target.attach(0));
     blit(newFBO);
@@ -467,7 +374,7 @@ function resizeDoubleFBO (target, w, h, internalFormat, format, type, param) {
     if (target.width == w && target.height == h)
         return target;
     target.read = resizeFBO(target.read, w, h, internalFormat, format, type, param);
-    target.write = createFBO(w, h, internalFormat, format, type, param);
+    target.write = LGL.createFBO(w, h, internalFormat, format, type, param);
     target.width = w;
     target.height = h;
     target.texelSizeX = 1.0 / w;
