@@ -1559,7 +1559,7 @@ function initFramebuffers () {
     divergence = createFBO      (simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
     curl       = createFBO      (simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
     pressure   = createDoubleFBO(simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
-    input      = createFBOwithTexture      (dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering, picture.texture);
+    input      = createFBO     (dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
     // noise       = createFBO      (simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
     //setup buffers for post process 
     // input=picture;
@@ -1830,25 +1830,29 @@ function drawScene(time) {
         
         // Draw the geometry.
         gl.drawElements(gl.TRIANGLES, bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
+        // blit(input);
         blit(input);
     });
     
     //// THINK I JUST NEED TO REPLACE THE BELOW WITH THE FLUID SIM CODE ..... ???
-
+    // input = createFBOwithTexture(targetTextureWidth, targetTextureHeight, gl.RGBA16F, gl.RGBA, gl.HALF_FLOAT , gl.LINEAR, targetTexture);
+    input.texture = targetTexture;
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
+    
     // render the cube with the texture we just rendered to
-    // gl.bindTexture(gl.TEXTURE_2D, targetTexture);
-
-    // // Tell WebGL how to convert from clip space to pixels
-    // gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.bindTexture(gl.TEXTURE_2D, input.texture);
+    
+    // Tell WebGL how to convert from clip space to pixels
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    // blit(input);
 
     // // Clear the canvas AND the depth buffer.
-    // gl.clearColor(1, 1, 1, 1);   // clear to white
-    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clearColor(1, 1, 1, 1);   // clear to white
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
-    // drawCube(aspect);
+    drawCube(aspect);
+    // blit(input);
 
     requestAnimationFrame(drawScene);
 }
@@ -1871,8 +1875,8 @@ function update () {
     //time step 
     const dt = calcDeltaTime();
     noiseSeed += dt * config.NOISE_TRANSLATE_SPEED;
-    if (resizeCanvas()) //resize if needed 
-        initFramebuffers();
+    // if (resizeCanvas()) //resize if needed 
+    //     initFramebuffers();
     updateColors(dt); //step through our sim 
     applyInputs(); //take from ui
     if (!config.PAUSED)
