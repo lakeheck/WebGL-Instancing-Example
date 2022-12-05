@@ -1462,7 +1462,7 @@ const noiseProgram              = new LGL.Program(GLSL.baseVertexShader, GLSL.no
 //create a material from our display shader source to capitalize on the #defines for optimization 
 //TODO - do we have to compile this source differently since there are the defines? 
 //this also allows us to only use the active uniforms 
-const displayMaterial = new LGL.Material(baseVertexShader, displayShaderSource);
+const displayMaterial = new LGL.Material(GLSL.baseVertexShader, GLSL.displayShaderSource);
 
 
 function initFramebuffers () {
