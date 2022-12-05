@@ -302,13 +302,13 @@ function initFramebuffers () {
         noise = LGL.createDoubleFBO(dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
     }
     else {//resize if needed 
-        dye = resizeDoubleFBO(dye, dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
-        noise = resizeDoubleFBO(noise, dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
+        dye = LGL.resizeDoubleFBO(dye, dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
+        noise = LGL.resizeDoubleFBO(noise, dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
     }
     if (velocity == null)
         velocity = LGL.createDoubleFBO(simRes.width, simRes.height, rg.internalFormat, rg.format, texType, filtering);
     else //resize if needed 
-        velocity = resizeDoubleFBO(velocity, simRes.width, simRes.height, rg.internalFormat, rg.format, texType, filtering);
+        velocity = LGL.resizeDoubleFBO(velocity, simRes.width, simRes.height, rg.internalFormat, rg.format, texType, filtering);
     //other buffer objects that dont need feedback / ping-pong 
     //notice the filtering type is set to gl.NEAREST meaning we grab just a single px, no filtering 
     divergence = LGL.createFBO      (simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
@@ -360,27 +360,6 @@ function initSunraysFramebuffers () {
 }
 
 
-
-
-function resizeFBO (target, w, h, internalFormat, format, type, param) {
-    let newFBO = LGL.createFBO(w, h, internalFormat, format, type, param);
-    copyProgram.bind();
-    gl.uniform1i(copyProgram.uniforms.uTexture, target.attach(0));
-    blit(newFBO);
-    return newFBO;
-}
-
-function resizeDoubleFBO (target, w, h, internalFormat, format, type, param) {
-    if (target.width == w && target.height == h)
-        return target;
-    target.read = resizeFBO(target.read, w, h, internalFormat, format, type, param);
-    target.write = LGL.createFBO(w, h, internalFormat, format, type, param);
-    target.width = w;
-    target.height = h;
-    target.texelSizeX = 1.0 / w;
-    target.texelSizeY = 1.0 / h;
-    return target;
-}
 
 function createTextureAsync (url) {
     let texture = gl.createTexture();
