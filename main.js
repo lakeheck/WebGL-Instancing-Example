@@ -4,6 +4,7 @@ import startGUI from "./js/GUI.js";
 import {gl, ext, canvas} from "./js/WebGL.js";
 import * as LGL from "./js/WebGL.js";
 import * as GLSL from "./js/Shaders.js";
+import * as FLUID from "./js/Fluid.js";
 
 LGL.resizeCanvas();
 
@@ -441,8 +442,8 @@ function drawScene(time) {
 //actually calling our functions to make program work 
 startGUI(config, initFramebuffers, LGL.updateKeywords);
 LGL.updateKeywords(config, displayMaterial);
-initFramebuffers();
-multipleSplats(parseInt(Math.random() * 20) + 5);
+FLUID.initFramebuffers();
+FLUID.multipleSplats(parseInt(Math.random() * 20) + 5);
 let noiseSeed = 0.0; 
 let lastUpdateTime = Date.now();
 let colorUpdateTimer = 0.0;
@@ -460,8 +461,8 @@ function update () {
     updateColors(dt); //step through our sim 
     applyInputs(); //take from ui
     if (!config.PAUSED)
-        step(dt); //do a calculation step 
-    render(null);
+        FLUID.step(dt, noiseSeed); //do a calculation step 
+    FLUID.render(null, displayMaterial);
     requestAnimationFrame(update);
     lastUpdateTime = Date.now();
 

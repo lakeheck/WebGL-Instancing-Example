@@ -69,6 +69,38 @@ const baseVertexShader = compileShader(gl.VERTEX_SHADER, `
     }
 `);
 
+export const colorShader = compileShader(gl.FRAGMENT_SHADER, `
+precision mediump float;
+
+uniform vec4 color;
+
+void main () {
+    gl_FragColor = color;
+}
+`);
+
+export const checkerboardShader = compileShader(gl.FRAGMENT_SHADER, `
+precision highp float;
+precision highp sampler2D;
+
+varying vec2 vUv;
+uniform sampler2D uTexture;
+uniform float aspectRatio;
+
+#define SCALE 25.0
+
+void main () {
+    vec2 uv = floor(vUv * SCALE * vec2(aspectRatio, 1.0));
+    float v = mod(uv.x + uv.y, 2.0);
+    v = v * 0.1 + 0.8;
+    gl_FragColor = vec4(vec3(v), 1.0);
+}
+`);
+
+const colorProgram              = new Program(baseVertexShader, colorShader);
+const checkerboardProgram       = new Program(baseVertexShader, checkerboardShader);
+
+
 export function getSupportedFormat (gl, internalFormat, format, type)
 {
     if (!supportRenderTextureFormat(gl, internalFormat, format, type))
@@ -585,3 +617,4 @@ export function resizeCanvas () {
     }
     return false;
 }
+
