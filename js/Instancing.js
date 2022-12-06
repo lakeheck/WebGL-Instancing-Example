@@ -8,6 +8,8 @@ export class Instancing{
     constructor(n){
         this.numObjects = 300;
         this.objects = [];
+        this.time = 0;
+        this.init();
     }
 
     arrays = {
@@ -84,7 +86,6 @@ export class Instancing{
     cameraHeight = 50;
     positionBuffer = gl.createBuffer();
     texture = gl.createTexture();
-    targetTextureHeight;
     frameBuffer;
     output;
 
@@ -116,7 +117,7 @@ export class Instancing{
         this.targetTextureWidth = 1024;
         this.targetTextureHeight = 1024;
         this.targetTexture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, targetTexture);
+        gl.bindTexture(gl.TEXTURE_2D, this.targetTexture);
         {
             // define size and format of level 0
             const level = 0;
@@ -126,7 +127,7 @@ export class Instancing{
             const type = gl.UNSIGNED_BYTE;
             const data = null;
             gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-                        targetTextureWidth, targetTextureHeight, border,
+                        this.targetTextureWidth, this.targetTextureHeight, border,
                         format, type, data);
 
             // set the filtering so we don't need mips
@@ -175,8 +176,8 @@ export class Instancing{
     }
 
 
-    drawScene(time) {
-        time = time * 0.0001 + 5;
+    drawScene() {
+        this.time += 0.01;
     
         // LGL.resizeCanvasToDisplaySize(gl.canvas);
     
@@ -223,28 +224,31 @@ export class Instancing{
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         
         // Draw objects
+
+        let parent = this;
+
         this.objects.forEach(function(object) {
     
             // Compute a position for this object based on the time.
-            var worldMatrix = m4.xRotation(object.xRotation * time);
-            worldMatrix = m4.yRotate(worldMatrix, object.yRotation * time);
+            var worldMatrix = m4.xRotation(object.xRotation * parent.time);
+            worldMatrix = m4.yRotate(worldMatrix, object.yRotation * parent.time);
             worldMatrix = m4.translate(worldMatrix, 0, 0, object.radius);
-            this.uniformsThatAreComputedForEachObject.u_world = worldMatrix;
+            parent.uniformsThatAreComputedForEachObject.u_world = worldMatrix;
     
             // Multiply the matrices.
-            m4.multiply(viewProjectionMatrix, worldMatrix, this.uniformsThatAreComputedForEachObject.u_worldViewProjection);
-            m4.transpose(m4.inverse(worldMatrix), this.uniformsThatAreComputedForEachObject.u_worldInverseTranspose);
+            m4.multiply(viewProjectionMatrix, worldMatrix, parent.uniformsThatAreComputedForEachObject.u_worldViewProjection);
+            m4.transpose(m4.inverse(worldMatrix), parent.uniformsThatAreComputedForEachObject.u_worldInverseTranspose);
     
             // Set the uniforms we just computed
-            webglUtils.setUniforms(this.programInfo, this.uniformsThatAreComputedForEachObject);
+            webglUtils.setUniforms(parent.programInfo, parent.uniformsThatAreComputedForEachObject);
     
             // Set the uniforms that are specific to the this object.
-            webglUtils.setUniforms(this.programInfo, object.materialUniforms);
+            webglUtils.setUniforms(parent.programInfo, object.materialUniforms);
             
             // Draw the geometry.
-            gl.drawElements(gl.TRIANGLES, this.bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.TRIANGLES, parent.bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
             // blit(input);
-            LGL.blit(this.output);
+            LGL.blit(null);
         });
         
         requestAnimationFrame(() => this.drawScene(this));
@@ -252,4 +256,14 @@ export class Instancing{
 
 }
 
-  
+var rand = function(min, max) {
+    if (max === undefined) {
+        max = min;
+        min = 0;
+    }
+    return min + Math.random() * (max - min);
+};
+
+var randInt = function(range) {
+    return Math.floor(Math.random() * range);
+};
