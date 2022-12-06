@@ -90,8 +90,8 @@ export class Instancing{
     frameBuffer;
     output;
 
-    targetTextureWidth = 1024; 
-    targetTextureHeight = 1024; 
+    targetTextureWidth = canvas.width; 
+    targetTextureHeight = canvas.width; 
 
     uniformsThatAreTheSameForAllObjects = {
         u_lightWorldPos:         [-50, 30, 100],
