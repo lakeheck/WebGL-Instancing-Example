@@ -10,6 +10,7 @@ export class Instancing{
         this.objects = [];
         this.time = 0;
         this.init();
+        this.speed = 0.001;
     }
 
     arrays = {
@@ -177,7 +178,7 @@ export class Instancing{
 
 
     drawScene() {
-        this.time += 0.01;
+        this.time += this.speed; //todo, make more stable and not dependent on fps
     
         // LGL.resizeCanvasToDisplaySize(gl.canvas);
     

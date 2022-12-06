@@ -12,7 +12,7 @@
         <link rel="apple-touch-icon" href="logo.png">
         <link rel="icon" href="logo.png">
 
-        <title>WebGL Fluid Simulation</title>
+        <title>WebGL Instancing</title>
         <meta name="description" content="A WebGL fluid simulation">
 
         <meta property="og:type" content="website">
@@ -49,255 +49,13 @@
                 height: 100%;
             }
 
-            .dg {
-                opacity: 0.9;
-            }
-
-            .dg .property-name {
-                overflow: visible;
-            }
-
-            .bigFont {
-                font-size: 150%;
-                color: #8C8C8C;
-            }
-
-            .cr.function.appBigFont {
-                font-size: 150%;
-                line-height: 27px;
-                color: #A5F8D3;
-                background-color: #023C40;
-            }
-
-            .cr.function.appBigFont .property-name {
-                float: none;
-            }
-
-            .cr.function.appBigFont .icon {
-                position: sticky;
-                bottom: 27px;
-            }
-
-            .icon {
-                font-family: 'iconfont';
-                font-size: 130%;
-                float: right;
-            }
-
-            .twitter:before {
-                content: 'a';
-            }
-
-            .github:before {
-                content: 'b';
-            }
-
-            .app:before {
-                content: 'c';
-            }
-
-            .discord:before {
-                content: 'd';
-            }
-
-            .promo {
-                display: none;
-                /* display: table; */
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: 1;
-                overflow: auto;
-                color: lightblue;
-                background-color: rgba(0,0,0,0.4);
-                animation: promo-appear-animation 0.35s ease-out;
-            }
-
-            .promo-middle {
-                display: table-cell;
-                vertical-align: middle;
-            }
-
-            .promo-content {
-                width: 80vw;
-                height: 80vh;
-                max-width: 80vh;
-                max-height: 80vw;
-                margin: auto;
-                padding: 0;
-                font-size: 2.8vmax;
-                font-family: Futura, "Trebuchet MS", Arial, sans-serif;
-                text-align: center;
-                background-image: url("promo_back.png");
-                background-position: center;
-                background-repeat: no-repeat;
-                background-size: cover;
-                border-radius: 15px;
-                box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-            }
-
-            .promo-header {
-                height: 10%;
-                padding: 2px 16px;
-            }
-
-            .promo-close {
-                width: 10%;
-                height: 100%;
-                text-align: left;
-                float: left;
-                font-size: 1.3em;
-                /* transition: 0.2s; */
-            }
-
-            .promo-close:hover {
-                /* transform: scale(1.25); */
-                cursor: pointer;
-            }
-
-            .promo-body {
-                padding: 8px 16px 16px 16px;
-                margin: auto;
-            }
-
-            .promo-body p {
-                margin-top: 0;
-                mix-blend-mode: color-dodge;
-            }
-
-            .link {
-                width: 100%;
-                display: inline-block;
-            }
-
-            .link img {
-                width: 100%;
-            }
-
-            @keyframes promo-appear-animation {
-                0% {
-                    transform: scale(2.0);
-                    opacity: 0;
-                }
-                100% {
-                    transform: scale(1.0);
-                    opacity: 1;
-                }
-            }
         </style>
         <script>
-            window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-            ga('create', '', 'auto');
-            ga('send', 'pageview');
+
         </script>
-        <script async src="https://www.google-analytics.com/analytics.js"></script>
     </head>
     <body>
-      
-    <script  id="vertex-shader-3d2" type="x-shader/x-vertex">
-  uniform mat4 u_worldViewProjection;
-  uniform vec3 u_lightWorldPos;
-  uniform mat4 u_world;
-  uniform mat4 u_viewInverse;
-  uniform mat4 u_worldInverseTranspose;
 
-  attribute vec4 a_position;
-  attribute vec3 a_normal;
-  attribute vec2 a_texcoord;
-
-  varying vec4 v_position;
-  varying vec2 v_texCoord;
-  varying vec3 v_normal;
-  varying vec3 v_surfaceToLight;
-  varying vec3 v_surfaceToView;
-
-  void main() {
-    v_texCoord = a_texcoord;
-    v_position = (u_worldViewProjection * a_position);
-    v_normal = (u_worldInverseTranspose * vec4(a_normal, 0)).xyz;
-    v_surfaceToLight = u_lightWorldPos - (u_world * a_position).xyz;
-    v_surfaceToView = (u_viewInverse[3] - (u_world * a_position)).xyz;
-    gl_Position = v_position;
-  }
-</script>
-<!-- fragment shader -->
-<script  id="fragment-shader-3d2" type="x-shader/x-fragment">
-precision mediump float;
-
-varying vec4 v_position;
-varying vec2 v_texCoord;
-varying vec3 v_normal;
-varying vec3 v_surfaceToLight;
-varying vec3 v_surfaceToView;
-
-uniform vec4 u_lightColor;
-uniform vec4 u_colorMult;
-uniform sampler2D u_diffuse;
-uniform vec4 u_specular;
-uniform float u_shininess;
-uniform float u_specularFactor;
-
-vec4 lit(float l ,float h, float m) {
-  return vec4(1.0,
-              abs(l),
-              (l > 0.0) ? pow(max(0.0, h), m) : 0.0,
-              1.0);
-}
-
-void main() {
-  vec4 diffuseColor = texture2D(u_diffuse, v_texCoord);
-  vec3 a_normal = normalize(v_normal);
-  vec3 surfaceToLight = normalize(v_surfaceToLight);
-  vec3 surfaceToView = normalize(v_surfaceToView);
-  vec3 halfVector = normalize(surfaceToLight + surfaceToView);
-  vec4 litR = lit(dot(a_normal, surfaceToLight),
-                    dot(a_normal, halfVector), u_shininess);
-  vec4 outColor = vec4((
-  u_lightColor * (diffuseColor * litR.y * u_colorMult +
-                u_specular * litR.z * u_specularFactor)).rgb,
-      diffuseColor.a);
-  gl_FragColor = outColor;
-//  gl_FragColor = vec4(litR.yyy, 1);
-}
-</script>
-<script  id="vertex-shader-3d" type="x-shader/box-vertex">
-attribute vec4 a_position;
-attribute vec2 a_texcoord;
-
-uniform mat4 u_matrix;
-
-varying vec2 v_texcoord;
-
-void main() {
-    // Multiply the position by the matrix.
-    gl_Position = u_matrix * a_position;
-
-    // Pass the texcoord to the fragment shader.
-    v_texcoord = a_texcoord;
-}
-</script>
-<!-- fragment shader -->
-<script  id="fragment-shader-3d" type="x-shader/box-fragment">
-precision mediump float;
-
-// Passed in from the vertex shader.
-varying vec2 v_texcoord;
-
-// The texture.
-uniform sampler2D u_texture;
-
-void main() {
-    gl_FragColor = texture2D(u_texture, v_texcoord);
-}
-</script><!--
-for most samples webgl-utils only provides shader compiling/linking and
-canvas resizing because why clutter the examples with code that's the same in every sample.
-See https://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html
-and https://webglfundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
-for webgl-utils, m3, m4, and webgl-lessons-ui.
--->
 <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
 <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
 <script src="https://webglfundamentals.org/webgl/resources/primitives.js"></script>
@@ -307,6 +65,5 @@ for webgl-utils, m3, m4, and webgl-lessons-ui.
  <canvas></canvas>
 </body>
 <script type="module" src="main.js"></script>
-<script type="module" src="./js/GUI.js"></script>
 
 
